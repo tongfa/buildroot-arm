@@ -1,0 +1,18 @@
+--- reveng-1.1.2/config.h.original	2013-07-02 20:39:05.196159383 -0700
++++ reveng-1.1.2/config.h	2013-07-02 20:39:40.776157895 -0700
+@@ -72,13 +72,13 @@
+ 
+ /* Size in bits of a bmp_t.  Not necessarily a power of two. */
+ 
+-#define BMP_BIT   32
++#define BMP_BIT   64
+ 
+ /* The highest power of two that is strictly less than BMP_BIT.
+  * Initialises the index of a binary search for set bits in a bmp_t.
+  */
+ 
+-#define BMP_SUB   16
++#define BMP_SUB   32
+ 
+ /*****************************************
+  *					 *
