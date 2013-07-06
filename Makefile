@@ -1,15 +1,19 @@
 
 all: buildroot reveng fmk-build
 
+.einhorn-prereqs:
+	mkdir -p dl
+	touch $@
+
 #               --- buildroot ---
 
-dl/buildroot-2013.05.tar.bz2:
-	( cd dl ; \
+dl/buildroot-2013.05.tar.bz2: | .einhorn-prereqs
+	( cd dl && \
 	wget http://buildroot.uclibc.org/downloads/buildroot-2013.05.tar.bz2 )
 	[ "$$(md5sum dl/buildroot-2013.05.tar.bz2)" ==  "881219ff40e966ef431c717cddbc464f  dl/buildroot-2013.05.tar.bz2" ]
 
 buildroot-2013.05: dl/buildroot-2013.05.tar.bz2
-	tar -xf $|
+	tar -xf $^
 
 buildroot-2013.05/.config: buildroot.config | buildroot-2013.05
 	cp buildroot.config $@
@@ -26,8 +30,8 @@ buildroot-dirclean:
 
 #               --- reveng ---
 
-dl/reveng-1.1.2.tar.xz:
-	( cd dl ; \
+dl/reveng-1.1.2.tar.xz: .einhorn-prereqs
+	( cd dl && \
 	wget http://downloads.sourceforge.net/project/reveng/1.1.2/reveng-1.1.2.tar.xz )
 	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" ==  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
 
@@ -47,21 +51,20 @@ reveng-dirclean:
 
 #               --- firmware modification kit ---
 
-.PHONY+=fmk-prereqs
 fmk/.prereqs:
 	dpkg -l zlib1g-dev > /dev/null
 	dpkg -l liblzma-dev > /dev/null
 	touch $@
 
-dl/fmk_099.tar.gz:
-	( cd dl ;\
+dl/fmk_099.tar.gz: fmk/.prereqs .einhorn-prereqs
+	( cd dl && \
 	wget https://firmware-mod-kit.googlecode.com/files/fmk_099.tar.gz )
 	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" ==  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
 
-fmk:
+fmk: dl/fmk_099.tar.gz
 	tar -xf dl/fmk_099.tar.gz
 
-fmk/.built: | fmk fmk/.prereqs
+fmk/.built: | fmk
 	(cd fmk/src ; \
 	./configure )
 	make -C fmk/src

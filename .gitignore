@@ -4,4 +4,5 @@ buildroot-patches/
 dl/
 reveng-1.1.2/
 fmk/
+.einhorn-*
 
