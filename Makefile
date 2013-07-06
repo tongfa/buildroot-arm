@@ -30,10 +30,10 @@ buildroot-dirclean:
 
 #               --- reveng ---
 
-dl/reveng-1.1.2.tar.xz: .einhorn-prereqs
+dl/reveng-1.1.2.tar.xz: | .einhorn-prereqs
 	( cd dl && \
 	wget http://downloads.sourceforge.net/project/reveng/1.1.2/reveng-1.1.2.tar.xz )
-	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" ==  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
+	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" =  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
 
 reveng-1.1.2: | dl/reveng-1.1.2.tar.xz
 	tar -xf $|
@@ -56,10 +56,10 @@ fmk/.prereqs:
 	dpkg -l liblzma-dev > /dev/null
 	touch $@
 
-dl/fmk_099.tar.gz: fmk/.prereqs .einhorn-prereqs
+dl/fmk_099.tar.gz: | fmk/.prereqs .einhorn-prereqs
 	( cd dl && \
 	wget https://firmware-mod-kit.googlecode.com/files/fmk_099.tar.gz )
-	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" ==  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
+	[ "$$(md5sum dl/fmk_099.tar.gz)" =  "91bd2cb3803880368af369d07271b5b9  dl/fmk_099.tar.gz" ]
 
 fmk: dl/fmk_099.tar.gz
 	tar -xf dl/fmk_099.tar.gz
