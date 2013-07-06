@@ -3,6 +3,8 @@ all: buildroot reveng fmk-build
 
 .einhorn-prereqs:
 	mkdir -p dl
+	dpkg -l zlib1g-dev > /dev/null #fmk
+	dpkg -l liblzma-dev > /dev/null #fmk
 	touch $@
 
 #               --- buildroot ---
@@ -37,8 +39,8 @@ dl/reveng-1.1.2.tar.xz: | .einhorn-prereqs
 
 reveng-1.1.2: | dl/reveng-1.1.2.tar.xz
 	tar -xf $|
-	(cd $@ ; \
-	patch ) < reveng-x86_64.patch
+	if [ "$$(uname -i)" = x86_64 ] ; then (cd $@ ; \
+	patch ) < reveng-x86_64.patch ; fi
 
 reveng-1.1.2/reveng: | reveng-1.1.2
 	make -C $|
@@ -51,12 +53,7 @@ reveng-dirclean:
 
 #               --- firmware modification kit ---
 
-fmk/.prereqs:
-	dpkg -l zlib1g-dev > /dev/null
-	dpkg -l liblzma-dev > /dev/null
-	touch $@
-
-dl/fmk_099.tar.gz: | fmk/.prereqs .einhorn-prereqs
+dl/fmk_099.tar.gz: | .einhorn-prereqs
 	( cd dl && \
 	wget https://firmware-mod-kit.googlecode.com/files/fmk_099.tar.gz )
 	[ "$$(md5sum dl/fmk_099.tar.gz)" =  "91bd2cb3803880368af369d07271b5b9  dl/fmk_099.tar.gz" ]
