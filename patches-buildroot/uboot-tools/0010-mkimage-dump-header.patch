@@ -1,0 +1,95 @@
+--- a/tools/mkimage.c.unmodified	2013-06-28 13:01:34.568427338 -0700
++++ b/tools/mkimage.c	2013-06-28 11:37:01.292207056 -0700
+@@ -142,6 +142,32 @@
+ 	return retval;
+ }
+ 
++__le32 swapendian(__be32 val) {
++  return ( ( val << 24 ) + 
++	   ( val >> 24 ) +
++	   ( (val & 0xFF0000) >> 8 ) + 
++	   ( (val & 0xFF00) << 8 )); 
++}
++
++void mkimage_dump_header(void *ptr)
++{
++  image_header_t* header = (image_header_t*) ptr;
++  printf("typedef struct image_header {\n");
++  printf("	__be32		ih_magic;	/* Image Header Magic Number	= %08x */ \n", swapendian(header->ih_magic));
++  printf("	__be32		ih_hcrc;	/* Image Header CRC Checksum	= %08x */ \n", swapendian(header->ih_hcrc));
++  printf("	__be32		ih_time;	/* Image Creation Timestamp	= %08x */ \n", swapendian(header->ih_time));
++  printf("	__be32		ih_size;	/* Image Data Size		= %08x */ \n", swapendian(header->ih_size));
++  printf("	__be32		ih_load;	/* Data	 Load  Address		= %08x */ \n", swapendian(header->ih_load));
++  printf("	__be32		ih_ep;		/* Entry Point Address		= %08x */ \n", swapendian(header->ih_ep));
++  printf("	__be32		ih_dcrc;	/* Image Data CRC Checksum	= %08x */ \n", swapendian(header->ih_dcrc));
++  printf("	uint8_t		ih_os;		/* Operating System		= %02x */ \n", header->ih_os);
++  printf("	uint8_t		ih_arch;	/* CPU architecture		= %02x */ \n", header->ih_arch);
++  printf("	uint8_t		ih_type;	/* Image Type			= %02x */ \n", header->ih_type);
++  printf("	uint8_t		ih_comp;	/* Compression Type		= %02x */ \n", header->ih_comp);
++  printf("	uint8_t		ih_name[IH_NMLEN];	/* Image Name		= \"%s\" */ \n", header->ih_name);
++  printf("} image_header_t;\n");
++}
++
+ int
+ main (int argc, char **argv)
+ {
+@@ -177,6 +203,9 @@
+ 			case 'l':
+ 				params.lflag = 1;
+ 				break;
++			case 'h':
++				params.hflag = 1;
++				break;
+ 			case 'A':
+ 				if ((--argc <= 0) ||
+ 					(params.arch =
+@@ -323,7 +352,7 @@
+ 			exit (retval);
+ 	}
+ 
+-	if (params.lflag || params.fflag) {
++	if (params.lflag || params.fflag || params.hflag) {
+ 		ifd = open (params.imagefile, O_RDONLY|O_BINARY);
+ 	} else {
+ 		ifd = open (params.imagefile,
+@@ -337,7 +366,7 @@
+ 		exit (EXIT_FAILURE);
+ 	}
+ 
+-	if (params.lflag || params.fflag) {
++	if (params.lflag || params.fflag || params.hflag) {
+ 		/*
+ 		 * list header information of existing image
+ 		 */
+@@ -371,6 +400,8 @@
+ 		 */
+ 		retval = mkimage_verify_print_header (ptr, &sbuf);
+ 
++		mkimage_dump_header(ptr);
++
+ 		(void) munmap((void *)ptr, sbuf.st_size);
+ 		(void) close (ifd);
+ 
+--- host-uboot-tools-2013.04/tools/mkimage.h.original	2013-06-29 09:45:36.363506452 -0700
++++ host-uboot-tools-2013.04/tools/mkimage.h	2013-06-29 09:45:57.587239634 -0700
+@@ -58,6 +58,7 @@
+ 	int eflag;
+ 	int fflag;
+ 	int lflag;
++	int hflag;
+ 	int vflag;
+ 	int xflag;
+ 	int skipcpy;
+--- a/tools/default_image.c.original	2013-06-29 09:10:38.857875669 -0700
++++ b/tools/default_image.c	2013-06-29 09:12:01.424837662 -0700
+@@ -93,6 +93,10 @@
+ 		fprintf(stderr,
+ 			"%s: ERROR: \"%s\" has corrupted data!\n",
+ 			params->cmdname, params->imagefile);
++		fprintf(stderr,
++			"%s: thrusting forward notwithstanding...\n",
++			params->cmdname);
++		return 0;
+ 		return -FDT_ERR_BADSTRUCTURE;
+ 	}
+ 	return 0;
