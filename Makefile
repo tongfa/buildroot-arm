@@ -17,8 +17,8 @@ dl/buildroot-2013.05.tar.bz2: | .einhorn-prereqs
 buildroot-2013.05: dl/buildroot-2013.05.tar.bz2
 	tar -xf $^
 
-buildroot-2013.05/.config: buildroot.config | buildroot-2013.05
-	cp buildroot.config $@
+buildroot-2013.05/.config: config.buildroot | buildroot-2013.05
+	cp config.buildroot $@
 
 buildroot-2013.05/.built: buildroot-2013.05/.config
 	make -C buildroot-2013.05
