@@ -1,16 +1,36 @@
 
 all: buildroot reveng fmk-build /usr/local/bin/binwalk
 
-.einhorn-prereqs:
+CHECK_PREREQ = if ! (dpkg -l $(1) | grep '^ii' > /dev/null) then \
+        STATUS=1; \
+        MISSING_PACKAGES="$${MISSING_PACKAGES} $(1)"; \
+        fi
+
+#FMK prerequisites
+PREREQS=zlib1g-dev liblzma-dev
+#??
+PREREQS+=libncurses5-dev
+#binwalk 
+PREREQS+=libqt4-opengl python-opengl python-qt4 python-qt4-gll python-numpy python-scipy python-pip
+
+.check-prereqs:
 	mkdir -p dl
-	dpkg -l zlib1g-dev > /dev/null #fmk
-	dpkg -l liblzma-dev > /dev/null #fmk
-	dpkg -l libncurses5-dev > /dev/null #??
+        declare -a MISSING_PACKAGES; \
+	for PREREQ in ( $(PREREQS) ) ; do \
+          $(call CHECK_PREREQ,$$PREREQ); \
+        done; \
+        if [ "$${MISSING_PACKAGES}" ] ; then \
+          echo ; \
+          echo run this command to install system prerequisites: ; \
+          echo sudo apt-get install $${MISSING_PACKAGES} ; \
+          echo ; \
+        fi ; \
+        exit $$STATUS
 	touch $@
 
 #               --- buildroot ---
 
-dl/buildroot-2013.05.tar.bz2: | .einhorn-prereqs
+dl/buildroot-2013.05.tar.bz2: | .check-prereqs
 	( cd dl && \
 	wget http://buildroot.uclibc.org/downloads/buildroot-2013.05.tar.bz2 )
 	[ "$$(md5sum dl/buildroot-2013.05.tar.bz2)" ==  "881219ff40e966ef431c717cddbc464f  dl/buildroot-2013.05.tar.bz2" ]
@@ -33,7 +53,7 @@ buildroot-dirclean:
 
 #               --- reveng ---
 
-dl/reveng-1.1.2.tar.xz: | .einhorn-prereqs
+dl/reveng-1.1.2.tar.xz: | .check-prereqs
 	( cd dl && \
 	wget http://downloads.sourceforge.net/project/reveng/1.1.2/reveng-1.1.2.tar.xz )
 	[ "$$(md5sum dl/reveng-1.1.2.tar.xz)" =  "a2a6d1fd09d5666ba7270bccef79c4fa  dl/reveng-1.1.2.tar.xz" ]
@@ -54,7 +74,7 @@ reveng-dirclean:
 
 #               --- firmware modification kit ---
 
-dl/fmk_099.tar.gz: | .einhorn-prereqs
+dl/fmk_099.tar.gz: | .check-prereqs
 	( cd dl && \
 	wget https://firmware-mod-kit.googlecode.com/files/fmk_099.tar.gz )
 	[ "$$(md5sum dl/fmk_099.tar.gz)" =  "91bd2cb3803880368af369d07271b5b9  dl/fmk_099.tar.gz" ]
@@ -72,21 +92,11 @@ fmk/.built: | fmk
 fmk-build: fmk/.built
 
 #               --- binwalk ---
-.binwalk-prereqs:
-	dpkg -l libqt4-opengl > /dev/null
-	dpkg -l python-opengl > /dev/null
-	dpkg -l python-qt4 > /dev/null
-	dpkg -l python-qt4-gl > /dev/null
-	dpkg -l python-numpy > /dev/null
-	dpkg -l python-scipy > /dev/null
-	dpkg -l python-pip > /dev/null
-	touch $@
 binwalk: .binwalk-prereqs
 	git clone https://github.com/devttys0/binwalk.git
 /usr/local/bin/binwalk: binwalk
 	(cd binwalk; sudo python setup.py install)
-	patch < binwalk-upgrade.patch
-	touch $@
+	patch -p2 < binwalk-upgrade.patch
 
 #               --- general ---
 .PHONY+=dir-clean
