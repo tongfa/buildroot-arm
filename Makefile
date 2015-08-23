@@ -39,7 +39,7 @@ dl/reveng-1.1.2.tar.xz: | .einhorn-prereqs
 
 reveng-1.1.2: | dl/reveng-1.1.2.tar.xz
 	tar -xf $|
-	if [ "$$(uname -i)" = x86_64 ] ; then (cd $@ ; \
+	if [ "$$(uname -m)" = x86_64 ] ; then (cd $@ ; \
 	patch ) < reveng-x86_64.patch ; fi
 
 reveng-1.1.2/reveng: | reveng-1.1.2
