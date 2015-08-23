@@ -1,22 +1,24 @@
 
+SHELL=/bin/bash
 all: buildroot reveng fmk-build /usr/local/bin/binwalk
+
+#FMK prerequisites
+PREREQS=zlib1g-dev liblzma-dev
+
+#??
+PREREQS+=libncurses5-dev
+
+#binwalk 
+PREREQS+=libqt4-opengl python-opengl python-qt4 python-numpy python-scipy python-pip
 
 CHECK_PREREQ = if ! (dpkg -l $(1) | grep '^ii' > /dev/null) then \
         STATUS=1; \
         MISSING_PACKAGES="$${MISSING_PACKAGES} $(1)"; \
         fi
-
-#FMK prerequisites
-PREREQS=zlib1g-dev liblzma-dev
-#??
-PREREQS+=libncurses5-dev
-#binwalk 
-PREREQS+=libqt4-opengl python-opengl python-qt4 python-qt4-gll python-numpy python-scipy python-pip
-
 .check-prereqs:
 	mkdir -p dl
-        declare -a MISSING_PACKAGES; \
-	for PREREQ in ( $(PREREQS) ) ; do \
+	declare -a MISSING_PACKAGES; \
+	for PREREQ in $(PREREQS) ; do \
           $(call CHECK_PREREQ,$$PREREQ); \
         done; \
         if [ "$${MISSING_PACKAGES}" ] ; then \
