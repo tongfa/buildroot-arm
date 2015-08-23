@@ -1,0 +1,8 @@
+--- ../buildroot-arm/fmk/shared-ng.inc.orig	2015-08-22 21:00:35.464033117 -0700
++++ ../buildroot-arm/fmk/shared-ng.inc	2015-08-22 21:01:02.064031880 -0700
+@@ -8,4 +8,4 @@
+ HEADER_IMAGE="$IMAGE_PARTS/header.img"
+ FOOTER_IMAGE="$IMAGE_PARTS/footer.img"
+ FWOUT="$DIR/new-firmware.bin"
+-BINWALK="./src/binwalk-1.0/src/bin/binwalk-script -v -m ./src/binwalk-1.0/src/binwalk/magic/binwalk"
++BINWALK="/usr/local/bin/binwalk"

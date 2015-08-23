@@ -1,5 +1,5 @@
 
-all: buildroot reveng fmk-build
+all: buildroot reveng fmk-build /usr/local/bin/binwalk
 
 .einhorn-prereqs:
 	mkdir -p dl
@@ -70,6 +70,22 @@ fmk/.built: | fmk
 .PHONY+=fmk-build
 fmk-build: fmk/.built
 
+#               --- binwalk ---
+.binwalk-prereqs:
+	dpkg -l libqt4-opengl > /dev/null
+	dpkg -l python-opengl > /dev/null
+	dpkg -l python-qt4 > /dev/null
+	dpkg -l python-qt4-gl > /dev/null
+	dpkg -l python-numpy > /dev/null
+	dpkg -l python-scipy > /dev/null
+	dpkg -l python-pip > /dev/null
+	touch $@
+binwalk: .binwalk-prereqs
+	git clone https://github.com/devttys0/binwalk.git
+/usr/local/bin/binwalk: binwalk
+	(cd binwalk; sudo python setup.py install)
+	patch < binwalk-upgrade.patch
+	touch $@
 
 #               --- general ---
 .PHONY+=dir-clean
