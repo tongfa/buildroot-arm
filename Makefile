@@ -1,6 +1,7 @@
 
 SHELL=/bin/bash
 all: buildroot reveng fmk-build /usr/local/bin/binwalk
+	@echo "build complete"
 
 #FMK prerequisites
 PREREQS=zlib1g-dev liblzma-dev
@@ -94,7 +95,7 @@ fmk/.built: | fmk
 fmk-build: fmk/.built
 
 #               --- binwalk ---
-binwalk: .binwalk-prereqs
+binwalk: | .check-prereqs
 	git clone https://github.com/devttys0/binwalk.git
 /usr/local/bin/binwalk: binwalk
 	(cd binwalk; sudo python setup.py install)
