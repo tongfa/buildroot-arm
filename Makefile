@@ -5,9 +5,6 @@ all: buildroot reveng fmk-build /usr/local/bin/binwalk
 	mkdir -p dl
 	dpkg -l zlib1g-dev > /dev/null #fmk
 	dpkg -l liblzma-dev > /dev/null #fmk
-	dpkg -l termcap-dev > /dev/null #??
-	dpkg -l libtermcap-dev > /dev/null #??
-	dpkg -l libtermcap > /dev/null #??
 	dpkg -l libncurses5-dev > /dev/null #??
 	touch $@
 
